@@ -7,6 +7,17 @@
   <a href="https://decompbuddy.com/games/sonic-heroes-gamecube?install"><img src="https://decompbuddy.com/install-button.svg" alt="Install With Decomp Buddy"></a>
 </p>
 
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MPL--2.0-blue" alt="License: MPL-2.0"></a>
+  <img src="https://img.shields.io/badge/Focus-Game%20Preservation-pink" alt="Focus: game preservation">
+  <img src="https://img.shields.io/badge/Platform-Switch%20%7C%20Windows-green" alt="Platforms: Switch, Windows (more later)">
+  <img src="https://img.shields.io/badge/Recompiler-gcrecomp-orange" alt="Recompiler: gcrecomp (shared with the Sonic Riders port)">
+  <img src="https://img.shields.io/badge/Type-Static%20Recompilation-blueviolet" alt="Type: static recompilation">
+  <img src="https://img.shields.io/badge/Status-Alpha%20(test%20build)-B00020" alt="Status: alpha test build">
+  <a href="https://github.com/teclilla18/sonic-heroes-recomp/releases"><img src="https://img.shields.io/github/v/release/teclilla18/sonic-heroes-recomp?include_prereleases&label=Release&color=0aa5e8" alt="Latest release"></a>
+  <a href="https://github.com/teclilla18/sonic-heroes-recomp/stargazers"><img src="https://img.shields.io/github/stars/teclilla18/sonic-heroes-recomp?style=flat&logo=github&color=yellow" alt="GitHub stars"></a>
+</p>
+
 # Sonic Heroes native port
 
 Play **Sonic Heroes** (GameCube, USA) natively, with no emulator, on a modded **Nintendo Switch**, and later on
