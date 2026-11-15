@@ -50,7 +50,7 @@ Every session starts with the GitHub issues + Discussions report (CLAUDE.md, use
    pause menu (centred?), 16:9 "HUD 4:3", Switch. The console has this build (switch/sonicheroes/, env.txt empty).
 2. **GM1 lag**: ask the user whether sys-clk overrides handheld for Heroes; else add a profile for
    010053480D9A0000 (handheld 1785/614/2133). Then mipmaps / per-frame GPU cost if still slow.
-3. **Issue #1 pulley**: reproduced on hardware; trace the release check (re-investigator, docs/notes/re/pulley.md).
+3. Issue #1 closed 2026-11-15: not a bug (the handle is pushed, not pulled; user).
 4. record_backtrace boot crash seen twice (hw6, hw14): find why a mapped guest read faults.
 5. Launcher Game page still says "two-player online races" (Riders text).
 6. Stage sweep (SR_DEVSTAGE), camera tilt sign, HD look, Android (older items).
