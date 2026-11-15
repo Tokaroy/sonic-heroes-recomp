@@ -31,13 +31,8 @@
 #define HEROES_GM_PLAYING    5u
 
 /* Sonic Riders' game data (GXEE8P), not found for Heroes: inert here (GAME_UNKNOWN).
- * Riders: _Main.rel: the unlock data (REL bss at the runtime's fixed 819FF380; a GameCube runs it from 805FB080,
- * where these are 806A9048 / 806A90A0). One status byte per Extreme Gear (0 locked, 1 the default gear,
- * 2 owned) and per character. The Chaos Emerald is gear 18: race code tests the player's gear
- * (player +0x1034) against 18 and 19, the two gears that run on rings. */
-#define GAME_GEAR_STATUS     GAME_UNKNOWN(0)   /* Riders 0x81AAD348 */
-#define GAME_GEAR_CHAOS_EMERALD 18
-#define GAME_CHAR_STATUS     GAME_UNKNOWN(8)   /* Riders 0x81AAD3A0 */
+ * (The Riders unlock bytes, GAME_GEAR_STATUS / GAME_CHAR_STATUS and the Chaos Emerald gear option, were removed
+ * 2026-11-15: Heroes has no Extreme Gear.) */
 #define GAME_PLAYERS         GAME_UNKNOWN(16)  /* Riders 0x81A0D740, _Main.rel bss: the 8 racers (code indexes it by i * 0x1080) */
 #define GAME_PLAYER_SIZE     0x1080u
 #define GAME_GEAR_TABLE      GAME_UNKNOWN(24)  /* Riders 0x819EA240, _Main.rel data: 41 Extreme Gear records of 0x1D0 bytes (game_mods.c) */

@@ -24,6 +24,8 @@ extern "C" {
 /* per draw, in every vertex's nrm[3] (gx.vert): 4:3 in the middle, moved to the left / right edge, or
  * stretched to the width (draws spanning the whole width: fades, backgrounds, screen effects) */
 enum { GX_ANCHOR_MIDDLE, GX_ANCHOR_LEFT, GX_ANCHOR_RIGHT, GX_ANCHOR_STRETCH };
+/* perspective draws of Sonic Heroes' Rt2d HUD (gx_render.c hud3d_anchor): + 0, 1, 2 steps of (1 - 1/k) to the right */
+#define GX_ANCHOR_HUD3D 4
 
 /* one decoded vertex: raw attributes as floats (the XF stage runs in the vertex shader) */
 typedef struct GxVertex {

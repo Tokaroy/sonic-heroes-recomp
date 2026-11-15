@@ -51,6 +51,11 @@ static uint32_t g_feat_copy_fmts;                                   /* their tar
 
 volatile int g_render_counts_fps;
 static uint32_t g_nanch;  /* 2D draws of this frame remembered for wide_anchor */
+/* Sonic Heroes' stage HUD and pause menu (RenderWare Rt2d, docs/notes/re/hud.md): perspective draws whose
+ * left edge follows the widened stage camera while their 640-pixel scale stays 4:3. This frame: 0 leave them,
+ * HUD3D_CENTER all moved into a 4:3 area in the middle, HUD3D_EDGES each moved by its 4:3 place (Fit) */
+enum { HUD3D_OFF, HUD3D_CENTER, HUD3D_EDGES };
+static int g_hud3d;
 static GxFrame* frame(void) {
     if (!g_frame) {
         uint64_t t = rt_ticks();
@@ -80,6 +85,10 @@ static GxFrame* frame(void) {
         g_gx.xf_reg[GX_XR_WIDE_FLAGS] =
             settings_screen_shown() == SCREEN_FIT ? GX_WIDE_HUD_43 | (racing ? GX_WIDE_HUD_EDGES : 0u)
             : g_settings.hud_stretch ? 0u : GX_WIDE_HUD_43;
+        /* the Rt2d HUD only where the stage camera is widened (patches.txt, rel_stage_active); in Fit by
+         * place also while paused (the pause menu is Rt2d too and stays in one piece) */
+        g_hud3d = k <= 1.0f || !rel_stage_active() || !(g_gx.xf_reg[GX_XR_WIDE_FLAGS] & GX_WIDE_HUD_43) ? HUD3D_OFF
+                  : settings_screen_shown() == SCREEN_FIT ? HUD3D_EDGES : HUD3D_CENTER;
         {
             static uint32_t last_fl = ~0u;
             if (g_gx.xf_reg[GX_XR_WIDE_FLAGS] != last_fl && k > 1.0f)
@@ -725,6 +734,43 @@ static void wide_anchor(GxFrame* f, uint32_t v0, uint32_t count) {
             }
 }
 
+/* An Rt2d draw: its vertices come already in world space (RwIm3D, transformed on the CPU) and are drawn with
+ * the camera's view matrix, all at the Rt2d layer depth (3.0 in front of the camera, Rt2d globals +0x390).
+ * Tested on the first vertex before decoding; hud3d_anchor checks them all. */
+#define HUD3D_DEPTH 3.0f
+static float hud3d_z(const GxVertex* v) {
+    float r[4];
+    memcpy(r, &g_gx.xf_mem[(((uint32_t)v->pos[3] * 4) & 0xFFC) + 8], sizeof r);
+    return r[0] * v->pos[0] + r[1] * v->pos[1] + r[2] * v->pos[2] + r[3];
+}
+static int hud3d_depth(const GxVertex* v) { return fabsf(fabsf(hud3d_z(v)) - HUD3D_DEPTH) < 1e-3f; }
+/* Each Rt2d draw sits where the widened left edge plus its 4:3 pixel x puts it (x_ndc = px / (320 k) - 1).
+ * Its 4:3 place picks the shift the vertex shader adds (GX_ANCHOR_HUD3D + 0, 1, 2: 0, 1 or 2 times
+ * (1 - 1/k) of the half width): left third stays at the left edge, the middle third moves to the middle,
+ * the right third to the right edge; HUD3D_CENTER moves everything by one step (a 4:3 HUD in the middle). */
+static void hud3d_anchor(GxFrame* f, uint32_t v0, uint32_t count) {
+    GxVertex* v = &f->verts[v0];
+    float P0, P1;
+    memcpy(&P0, &g_gx.xf_reg[0x20], 4);
+    memcpy(&P1, &g_gx.xf_reg[0x21], 4);
+    float lo = 1e30f, hi = -1e30f;
+    for (uint32_t i = 0; i < count; i++) {
+        if (!hud3d_depth(&v[i])) return;  /* 3D that happened to start at the layer depth */
+        float r[12];
+        memcpy(r, &g_gx.xf_mem[((uint32_t)v[i].pos[3] * 4) & 0xFFC], sizeof r);
+        float x = r[0] * v[i].pos[0] + r[1] * v[i].pos[1] + r[2] * v[i].pos[2] + r[3];
+        float z = r[8] * v[i].pos[0] + r[9] * v[i].pos[1] + r[10] * v[i].pos[2] + r[11];
+        if (z == 0.0f) return;
+        float nx = (P0 * x + P1 * z) / -z;
+        if (nx < lo) lo = nx;
+        if (nx > hi) hi = nx;
+    }
+    float px = (0.5f * (lo + hi) + 1.0f) * 320.0f * f->wide_k;  /* the draw's middle in 4:3 pixels */
+    int step = g_hud3d == HUD3D_CENTER ? 1 : px < 640.0f / 3.0f ? 0 : px > 1280.0f / 3.0f ? 2 : 1;
+    if (anchor_log()) rt_log("[anchor] Rt2d draw: %u verts x %.3f..%.3f (4:3 px %.0f) -> step %d", count, lo, hi, px, step);
+    for (uint32_t i = 0; i < count; i++) v[i].nrm[3] = (float)(GX_ANCHOR_HUD3D + step);
+}
+
 static void draw_impl(int prim, int vat, uint32_t count, const uint8_t* vertices, uint32_t vertex_size) {
     if (!count) return;
     if (g_state_dirty) {
@@ -757,8 +803,15 @@ static void draw_impl(int prim, int vat, uint32_t count, const uint8_t* vertices
     uint64_t td = rt_ticks();
     /* 2D in a wide mode: decoded here, the anchor needs the positions (wide_anchor) */
     int anchor = g_gx.xf_reg[0x26] != 0 && (g_gx.xf_reg[GX_XR_WIDE_FLAGS] & GX_WIDE_HUD_43) && f->wide_k > 1.0f;
+    int hud3d = 0;
+    if (g_hud3d && g_gx.xf_reg[0x26] == 0) {
+        GxVertex first;
+        const uint8_t* q = vertices;
+        decode_planned(&q, &plan, &first);
+        hud3d = hud3d_depth(&first);
+    }
     if (!check) {
-        if (anchor || !dj_queue(&fplan, &f->verts[f->nverts], count, vertices, count * vertex_size))
+        if (anchor || hud3d || !dj_queue(&fplan, &f->verts[f->nverts], count, vertices, count * vertex_size))
             for (uint32_t i = 0; i < count; i++) decode_fast(&p, &fplan, &f->verts[f->nverts + i]);
     } else {  /* SR_DECODECHECK: the reference decoder too, compared bit for bit */
         static unsigned long long checked, bad;
@@ -780,6 +833,7 @@ static void draw_impl(int prim, int vat, uint32_t count, const uint8_t* vertices
             rt_log("[decodecheck] %llu vertices compared, %llu mismatches", checked, bad);
     }
     if (anchor) wide_anchor(f, f->nverts, count);
+    if (hud3d) hud3d_anchor(f, f->nverts, count);
     g_decode_ticks += rt_ticks() - td;
     f->idx = grow(f->idx, &f->cap_idx, f->nidx + out_n, sizeof(uint32_t));
     uint32_t* o = f->idx + f->nidx;

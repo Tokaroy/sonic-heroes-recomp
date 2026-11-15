@@ -117,7 +117,6 @@ struct Settings {
     int pc_fps = 0;       /* pictures per second with in-between pictures: 0 = the game's own, -1 = unlimited */
     int hud_stretch = 0;
     int fov = 100;        /* 80..130 percent */
-    int chaos_emerald_shop = 0;
     int pad_background = 1;  /* controllers work while the game window is not focused */
     int sharpness = 0;       /* FSR sharpening of the final picture, 0 (off)..100 percent */
     std::vector<std::pair<std::string, std::string>> other;
@@ -132,7 +131,6 @@ int* setting_ptr(const std::string& k) {
     if (k == "pc_fps") return &g_set.pc_fps;
     if (k == "hud_stretch") return &g_set.hud_stretch;
     if (k == "fov") return &g_set.fov;
-    if (k == "chaos_emerald_shop") return &g_set.chaos_emerald_shop;
     if (k == "pad_background") return &g_set.pad_background;
     if (k == "sharpness") return &g_set.sharpness;
     return nullptr;
@@ -143,6 +141,7 @@ void settings_load() {
         size_t eq = l.find('=');
         if (eq == std::string::npos) continue;
         std::string k = l.substr(0, eq), v = l.substr(eq + 1);
+        if (k == "chaos_emerald_shop") continue;  /* removed 2026-11-15 (a Sonic Riders unlock) */
         if (int* p = setting_ptr(k)) *p = atoi(v.c_str());
         else g_set.other.push_back({k, v});
     }
@@ -153,9 +152,9 @@ void settings_load() {
 void settings_save() {
     CreateDirectoryW(path(L"saves").c_str(), nullptr);
     char b[512];
-    snprintf(b, sizeof b, "screen=%d\nshow_fps=%d\nchaos_emerald_shop=%d\nfullscreen=%d\nframerate=%d\npc_fps=%d\nhud_stretch=%d\nfov=%d\n"
+    snprintf(b, sizeof b, "screen=%d\nshow_fps=%d\nfullscreen=%d\nframerate=%d\npc_fps=%d\nhud_stretch=%d\nfov=%d\n"
              "pad_background=%d\nsharpness=%d\n",
-             g_set.screen, g_set.show_fps, g_set.chaos_emerald_shop, g_set.fullscreen, g_set.framerate, g_set.pc_fps,
+             g_set.screen, g_set.show_fps, g_set.fullscreen, g_set.framerate, g_set.pc_fps,
              g_set.hud_stretch, g_set.fov, g_set.pad_background, g_set.sharpness);
     std::string s = b;
     for (auto& kv : g_set.other) s += kv.first + "=" + kv.second + "\n";
@@ -1007,11 +1006,6 @@ void page_graphics(float w) {
 
 void page_game(float w) {
     (void)w;
-    section("UNLOCKS");
-    bool ce = g_set.chaos_emerald_shop != 0;
-    if (ImGui::Checkbox("Chaos Emerald gear in the shop (Super Sonic)", &ce)) { g_set.chaos_emerald_shop = ce; g_set_dirty = true; }
-    note("Normally earned by finishing the story. When on, the Shop sells it for 0 rings; nothing else is unlocked.");
-    ImGui::Spacing();
     section("SAVES");
     note("Your memory card and settings live in the saves folder here. Back it up before trying mods.");
     if (ImGui::Button("Open the saves folder")) {
@@ -1671,8 +1665,8 @@ void test_note(const char* fmt, ...) {
 }
 std::string settings_text() {
     char b[256];
-    snprintf(b, sizeof b, "screen=%d show_fps=%d chaos_emerald_shop=%d fullscreen=%d framerate=%d pc_fps=%d hud_stretch=%d fov=%d pad_background=%d sharpness=%d",
-             g_set.screen, g_set.show_fps, g_set.chaos_emerald_shop, g_set.fullscreen, g_set.framerate, g_set.pc_fps,
+    snprintf(b, sizeof b, "screen=%d show_fps=%d fullscreen=%d framerate=%d pc_fps=%d hud_stretch=%d fov=%d pad_background=%d sharpness=%d",
+             g_set.screen, g_set.show_fps, g_set.fullscreen, g_set.framerate, g_set.pc_fps,
              g_set.hud_stretch, g_set.fov, g_set.pad_background, g_set.sharpness);
     return b;
 }

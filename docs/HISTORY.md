@@ -280,3 +280,20 @@ Dated sessions and hardware tests, oldest first. The Sonic Riders port's history
 - Issue #1 (Switch OLED docked overclock, alpha.1): in Grand Metropolis 1 the characters let go of the pulley as
   soon as they pull back (hold B + walk back). Bug-report zip and screenshot attached; not yet looked at. Grand
   Metropolis was never tested by us [uncertain cause: input path or physics/collision].
+
+## 2026-11-15: Chaos Emerald option removed, Rt2d HUD anchoring, Grand Metropolis 1 lag profiled (hw14)
+
+- Chaos Emerald gear option (a Riders leftover) removed: launcher checkbox/key (old key dropped on load),
+  settings field, unlock code, GAME_GEAR_STATUS/CHAR_STATUS [tested PC: build, launcher Game page shot, settings read].
+- Fit/16:9 HUD: Heroes' stage HUD and pause menu are RenderWare Rt2d (docs/notes/re/hud.md, re-investigator): origin
+  from the widened camera every frame, 640-px scale baked at 4:3 on load. Fix (gx_render.c hud3d_anchor + gx.vert):
+  draws whose vertices sit at view depth 3.0 (Rt2d layer) are shifted per draw by their 4:3 x: left third 0, middle
+  (k-1)/k, right 2(k-1)/k (Fit); 16:9 HUD 4:3: all by (k-1)/k. PC Fit 1280x720 Seaside Hill: team icons + gauge at
+  the right edge [confirmed PC shot]; pause menu, 16:9 mode and Switch NOT checked yet [uncertain].
+- GM1 lag (hw14, OLED handheld, 1.5x): GPU-bound at the hologram path after landing, GPU 16.9-17.2 ms -> 30 fps;
+  1x: peak 13.2 ms, 56-60 fps (mostly per-frame cost, not per-pixel). The port samples no mipmaps (render_deko.c).
+  sys-clk config has NO profile for Heroes (010053480D9A0000) and the global one is docked-only (1326/998), so
+  handheld likely ran stock 384 MHz GPU / 1020 CPU, not the overclock [likely; user to confirm].
+- Issue #1 pulley reproduced on hardware (B held, stick back -> lets go). Release check not traced yet.
+- Crash once at boot (build/hw14/atmo_crash.log): same record_backtrace data abort as hw6 (guest read 0x80E6AFE4
+  inside the mapped window), via __OSReschedule -> SelectThread -> OSLoadContext; next launches fine [uncertain].

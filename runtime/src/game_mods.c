@@ -20,9 +20,6 @@ void game_mods_frame(void) {
     dev_stage_frame();
     if (!g_linked) return;  /* before OSLink the REL's bss is other memory (the OS arena) */
     mods_apply_frame();  /* Gecko codes from mods (mods_data.c) */
-    /* the Chaos Emerald gear unlocked: its status byte kept "owned" as the save loads */
-    if (g_settings.chaos_emerald && ld8(GAME_GEAR_STATUS + GAME_GEAR_CHAOS_EMERALD) == 0)
-        st8(GAME_GEAR_STATUS + GAME_GEAR_CHAOS_EMERALD, 2);
 }
 
 void game_mods_linked(void) {

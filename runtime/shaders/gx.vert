@@ -92,7 +92,7 @@ void main() {
   /* field of view setting (gx_render.h GX_XR_FOV): perspective projections see fs times the game's
      vertical angle (taken from the projection), the picture scaled about its centre */
   float fs = uintBitsToFloat(XR(0x7D));
-  if (XR(0x26) == 0u && fs > 0.0 && fs != 1.0 && P2 != 0.0) {
+  if (XR(0x26) == 0u && fs > 0.0 && fs != 1.0 && P2 != 0.0 && a_nrm.w < 3.5) {
     float m = 1.0 / (tan(fs * atan(1.0 / abs(P2))) * abs(P2));
     clip.x = clip.x * m;
     clip.y = clip.y * m;
@@ -101,6 +101,12 @@ void main() {
     float wk = uintBitsToFloat(XR(0x7E));
     float an = a_nrm.w;
     if (wk > 1.0 && an < 2.5) clip.x = clip.x / wk + (an > 1.5 ? 1.0 - 1.0 / wk : an > 0.5 ? 1.0 / wk - 1.0 : 0.0) * clip.w;
+  }
+  /* Sonic Heroes' Rt2d HUD (perspective, GX_ANCHOR_HUD3D + step; the field of view setting left it alone above):
+     moved right by step x (1 - 1/k) of the half width */
+  if (XR(0x26) == 0u && a_nrm.w > 3.5) {
+    float wk = uintBitsToFloat(XR(0x7E));
+    if (wk > 1.0) clip.x += (a_nrm.w - 4.0) * (1.0 - 1.0 / wk) * clip.w;
   }
   float xs = uintBitsToFloat(XR(0x1A)), ys = uintBitsToFloat(XR(0x1B)), zs = uintBitsToFloat(XR(0x1C));
   float zo = uintBitsToFloat(XR(0x1F));

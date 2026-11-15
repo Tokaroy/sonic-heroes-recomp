@@ -1,4 +1,4 @@
-# State (2026-11-14, end: Decomp Buddy badges; session-start GitHub check rule; issue #1 open)
+# State (2026-11-15, end: Chaos Emerald option removed; Rt2d HUD fix on PC; GM1 lag profiled)
 
 Read this at the start of every session. Rewrite it in place at the end of each session (never append). Stories
 behind each line: `grep` the date or topic in [docs/HISTORY.md](docs/HISTORY.md) (Riders' history:
@@ -46,27 +46,14 @@ Every session starts with the GitHub issues + Discussions report (CLAUDE.md, use
 
 ## Open items, in order
 
-1. **Issue #1: pulley in Grand Metropolis 1** (user, Switch OLED docked 1785/1152/2133, alpha.1, Fit): hold B on
-   the pulley and walk back, the character lets go at once. Attachments on the issue: bug-report zip
-   (bug-report-20261113-022347.zip) + shot_83945.bmp; not downloaded or read yet. Grand Metropolis never tested by
-   us. Suspects [uncertain]: held-button + stick input path, or physics/collision. PC release unpacked at
-   <home>/Desktop/SonicHeroes-PC-0.1.0-alpha.1 (not yet installed or played).
-2. **Remove the Chaos Emerald gear option** (user, 2026-11-12: a Sonic Riders feature): the launcher's checkbox
-   (launcher/launcher.cpp ~1011, setting chaos_emerald_shop), g_settings.chaos_emerald (settings.c, game_mods.c,
-   GAME_GEAR_* in game_addrs.h) and other Riders gear leftovers (mods_data.c gear names). Keep shared files
-   cherry-pickable (game-specific code clearly marked, CLAUDE.md fork rules).
-3. **Fit HUD layout** (user, hw12 shots build/hw12/shot_6435, 12977): pause menu off-centre everywhere; the team
-   switch icon and Team Blast gauge stay near the centre instead of the right edge. Heroes' stage HUD is placed from
-   the widened stage camera when the stage loads (not per-piece 2D: SR_ANCHORLOG sees only the shadow corner), so
-   it needs the HUD objects' position code (re-investigator) and a Dolphin 4:3 reference of the pause menu.
-   The gx_render.c "edges only in manager state 5" change is implemented; saving box after a stage (hw11
-   shot_17183, split in three) not re-checked.
-4. **Stage sweep** with SR_DEVSTAGE (keys: notes/re/stage-select.md): every story stage + bosses on PC, then Eden /
-   console; crashes, shader keys, rendering vs Dolphin (special stage looks very bright even without bloom).
-5. Camera tilt direction in scripted runs: CY=+110 raised the camera (looks down) in build/run1/cam; the user chose
-   "stick up = view up" on hardware. Check the SR_INPUT CY sign vs a real pad before relying on it [uncertain].
-6. If the Pause -> Quit crash returns (build/hw6/atmo_crash.log): same stack? Then record_backtrace.
-7. Later: HD look, widescreen menus, Android. Guard --history still lists 5 pre-fork Riders pictures.
+1. **Check the HUD fix** (gx_render.c hud3d_anchor, HISTORY 2026-11-15): tested PC Fit in play only. Check the
+   pause menu (centred?), 16:9 "HUD 4:3", Switch. The console has this build (switch/sonicheroes/, env.txt empty).
+2. **GM1 lag**: ask the user whether sys-clk overrides handheld for Heroes; else add a profile for
+   010053480D9A0000 (handheld 1785/614/2133). Then mipmaps / per-frame GPU cost if still slow.
+3. **Issue #1 pulley**: reproduced on hardware; trace the release check (re-investigator, docs/notes/re/pulley.md).
+4. record_backtrace boot crash seen twice (hw6, hw14): find why a mapped guest read faults.
+5. Launcher Game page still says "two-player online races" (Riders text).
+6. Stage sweep (SR_DEVSTAGE), camera tilt sign, HD look, Android (older items).
 
 ## Hardware / console notes
 

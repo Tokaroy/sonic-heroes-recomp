@@ -7,8 +7,7 @@
 #include "runtime.h"
 #include "settings.h"
 
-/* the Chaos Emerald unlock starts off: players who want to earn it themselves (user, 2026-11-07) */
-Settings g_settings = {SCREEN_4_3, 0, RES_1X, 0, 0, FR_AUTO, 1, 0, 100, 2, 1, 0, 0, 100, 100, 0, 0, 0, 1, 0, 1, 1, 100, SPECIAL_STEER_DEFAULT};
+Settings g_settings = {SCREEN_4_3, 0, RES_1X, 0, FR_AUTO, 1, 0, 100, 2, 1, 0, 0, 100, 100, 0, 0, 0, 1, 0, 1, 1, 100, SPECIAL_STEER_DEFAULT};
 volatile double g_aspect_scale = 1.0;
 /* Sonic Heroes camera (config/G9SE8P/patches.txt, docs/notes/re/camera.md): turn speed factor (setting
  * cam_speed) and the right stick's up/down (-127..127, si.c modern_tilt; + = stick up) */
@@ -80,13 +79,12 @@ float settings_wide_k(void) { return g_wide_k; }
 /* the log says what was on, at start-up and after each change in the menu (hardware test reports) */
 static void settings_log(const char* when) {
     rt_log("[settings] %sscreen: %s (%.3f), HUD %s, field of view %d%%, fps counter %s, resolution %s, frame rate %s, PC pictures %d/s, "
-           "sharpness %d%%, pad in background %s, handheld graphics %s, Chaos Emerald gear %s",
+           "sharpness %d%%, pad in background %s, handheld graphics %s",
            when, settings_screen_name(g_settings.screen), settings_display_aspect(),
            g_settings.screen == SCREEN_FIT ? "at the edges" : g_settings.hud_stretch ? "stretched" : "4:3", g_settings.fov, g_settings.show_fps ? "on" : "off",
            settings_resolution_name(g_settings.resolution),
            settings_framerate_name(g_settings.framerate), g_settings.pc_fps,
-           g_settings.sharpness, g_settings.pad_background ? "on" : "off", g_settings.handheld_gpu ? "384 MHz" : "system default",
-           g_settings.chaos_emerald ? "unlocked" : "as in the save");
+           g_settings.sharpness, g_settings.pad_background ? "on" : "off", g_settings.handheld_gpu ? "384 MHz" : "system default");
 }
 
 static void apply_view(void) {
@@ -122,8 +120,6 @@ void settings_load(void) {
             if (!strcmp(line, "screen") && v >= 0 && v < SCREEN_MODES) g_settings.screen = v;
             else if (!strcmp(line, "show_fps")) g_settings.show_fps = v != 0;
             else if (!strcmp(line, "resolution") && v >= 0 && v < RES_MODES) g_settings.resolution = v;
-            /* a new key: older builds saved "chaos_emerald" as on by default */
-            else if (!strcmp(line, "chaos_emerald_shop")) g_settings.chaos_emerald = v != 0;
             else if (!strcmp(line, "fullscreen")) g_settings.fullscreen = v != 0;
             else if (!strcmp(line, "framerate") && v >= 0 && v < FR_MODES) g_settings.framerate = v;
             else if (!strcmp(line, "handheld_gpu")) g_settings.handheld_gpu = v != 0;
@@ -224,9 +220,9 @@ void settings_apply(void) {
         rt_log("[settings] cannot write %s", platform_settings_path());
         return;
     }
-    fprintf(f, "screen=%d\nshow_fps=%d\nresolution=%d\nchaos_emerald_shop=%d\nfullscreen=%d\nframerate=%d\nhandheld_gpu=%d\nhud_stretch=%d\nfov=%d\npc_scale=%d\nmsaa=%d\nbloom=%d\ngrade_bright=%d\ngrade_contrast=%d\ngrade_sat=%d\ngrade_warm=%d\nchar_light=%d\npc_fps=%d\npad_background=%d\nsharpness=%d\nupdate_check=%d\nmodern_controls=%d\ncam_speed=%d\nspecial_steer=%d\n",
+    fprintf(f, "screen=%d\nshow_fps=%d\nresolution=%d\nfullscreen=%d\nframerate=%d\nhandheld_gpu=%d\nhud_stretch=%d\nfov=%d\npc_scale=%d\nmsaa=%d\nbloom=%d\ngrade_bright=%d\ngrade_contrast=%d\ngrade_sat=%d\ngrade_warm=%d\nchar_light=%d\npc_fps=%d\npad_background=%d\nsharpness=%d\nupdate_check=%d\nmodern_controls=%d\ncam_speed=%d\nspecial_steer=%d\n",
             g_settings.screen,
-            g_settings.show_fps, g_settings.resolution, g_settings.chaos_emerald, g_settings.fullscreen, g_settings.framerate,
+            g_settings.show_fps, g_settings.resolution, g_settings.fullscreen, g_settings.framerate,
             g_settings.handheld_gpu, g_settings.hud_stretch, g_settings.fov, g_settings.pc_scale, g_settings.msaa,
             g_settings.bloom, g_settings.grade_bright, g_settings.grade_contrast, g_settings.grade_sat, g_settings.grade_warm,
             g_settings.char_light, g_settings.pc_fps, g_settings.pad_background, g_settings.sharpness, g_settings.update_check,
