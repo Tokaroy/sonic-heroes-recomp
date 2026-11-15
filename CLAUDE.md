@@ -18,6 +18,17 @@ Current status (loaded automatically):
   `config/G9SE8P/` and clearly marked game files, not scattered through shared runtime files.
 - Docs marked **Inherited** still hold Riders' facts; Riders' history is in `docs/archive/riders/` (read-only).
 
+## Start of every session (user's rule, 2026-11-14)
+
+Before any other work, check GitHub and report back to the user in a short list (new since last session first):
+- Issues: `gh issue list --state all --limit 30` (open ones + anything updated since the last HISTORY.md date);
+  open the new or updated ones with `gh issue view <n> --comments`.
+- Discussions: `gh api graphql -f query='query{repository(owner:"teclilla18",name:"sonic-heroes-recomp"){hasDiscussionsEnabled
+  discussions(first:20,orderBy:{field:UPDATED_AT,direction:DESC}){nodes{number title updatedAt comments{totalCount}}}}}'`
+  (if Discussions are turned off, say so in one line).
+- For each: number, title, what the reporter says, platform/version, and a one-line triage (bug we know, new bug,
+  needs info, feature request). Do not reply, label or close on GitHub without the user's go-ahead.
+
 ## Hard rules
 
 1. **Game-data guard.** Never commit, paste or upload anything derived from the game: ISO/disc images, DOL, REL,
