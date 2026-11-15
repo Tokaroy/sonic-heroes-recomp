@@ -753,22 +753,39 @@ static void hud3d_anchor(GxFrame* f, uint32_t v0, uint32_t count) {
     float P0, P1;
     memcpy(&P0, &g_gx.xf_reg[0x20], 4);
     memcpy(&P1, &g_gx.xf_reg[0x21], 4);
-    float lo = 1e30f, hi = -1e30f;
+    float lo = 1e30f, hi = -1e30f, ylo = 1e30f, yhi = -1e30f;
     for (uint32_t i = 0; i < count; i++) {
         if (!hud3d_depth(&v[i])) return;  /* 3D that happened to start at the layer depth */
         float r[12];
         memcpy(r, &g_gx.xf_mem[((uint32_t)v[i].pos[3] * 4) & 0xFFC], sizeof r);
         float x = r[0] * v[i].pos[0] + r[1] * v[i].pos[1] + r[2] * v[i].pos[2] + r[3];
+        float y = r[4] * v[i].pos[0] + r[5] * v[i].pos[1] + r[6] * v[i].pos[2] + r[7];
         float z = r[8] * v[i].pos[0] + r[9] * v[i].pos[1] + r[10] * v[i].pos[2] + r[11];
         if (z == 0.0f) return;
-        float nx = (P0 * x + P1 * z) / -z;
+        float nx = (P0 * x + P1 * z) / -z, ny = y / -z;
         if (nx < lo) lo = nx;
         if (nx > hi) hi = nx;
+        if (ny < ylo) ylo = ny;
+        if (ny > yhi) yhi = ny;
     }
-    float px = (0.5f * (lo + hi) + 1.0f) * 320.0f * f->wide_k;  /* the draw's middle in 4:3 pixels */
+    /* a line of text comes in several draws, one after another on the same row (subtitles split in three,
+     * Switch 2026-11-15): the whole run moves by the middle of the line */
+    static struct { GxFrame* f; unsigned long long frame; uint32_t v0, vend; float lo, hi, y0, y1; } run;
+    float h = yhi - ylo, gap = lo - run.hi;
+    uint32_t first = v0;
+    if (run.f == f && run.frame == g_frames && run.vend == v0 && h > 0.0f && fabsf(ylo - run.y0) < 0.25f * h &&
+        fabsf(yhi - run.y1) < 0.25f * h && gap > -0.05f && gap < 0.1f) {
+        if (run.lo < lo) lo = run.lo;
+        if (run.hi > hi) hi = run.hi;
+        first = run.v0;
+    } else {
+        run.f = f; run.frame = g_frames; run.v0 = v0; run.y0 = ylo; run.y1 = yhi;
+    }
+    run.lo = lo; run.hi = hi; run.vend = v0 + count;
+    float px = (0.5f * (lo + hi) + 1.0f) * 320.0f * f->wide_k;  /* the run's middle in 4:3 pixels */
     int step = g_hud3d == HUD3D_CENTER ? 1 : px < 640.0f / 3.0f ? 0 : px > 1280.0f / 3.0f ? 2 : 1;
     if (anchor_log()) rt_log("[anchor] Rt2d draw: %u verts x %.3f..%.3f (4:3 px %.0f) -> step %d", count, lo, hi, px, step);
-    for (uint32_t i = 0; i < count; i++) v[i].nrm[3] = (float)(GX_ANCHOR_HUD3D + step);
+    for (uint32_t i = first; i < v0 + count; i++) f->verts[i].nrm[3] = (float)(GX_ANCHOR_HUD3D + step);
 }
 
 static void draw_impl(int prim, int vat, uint32_t count, const uint8_t* vertices, uint32_t vertex_size) {

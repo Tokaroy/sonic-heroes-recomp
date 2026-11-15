@@ -298,3 +298,4 @@ Dated sessions and hardware tests, oldest first. The Sonic Riders port's history
 - Crash once at boot (build/hw14/atmo_crash.log): same record_backtrace data abort as hw6 (guest read 0x80E6AFE4
   inside the mapped window), via __OSReschedule -> SelectThread -> OSLoadContext; next launches fine [uncertain].
 - Issue #1 closed by the user's decision: not a bug, the GM1 handle is pushed into the wall, not pulled.
+- Subtitles split into pieces by the Rt2d HUD fix (user's Switch shots build/hw15): consecutive draws on one row now move together by the line's middle (hud3d_anchor run) [implemented; not tested].
