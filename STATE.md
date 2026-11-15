@@ -1,4 +1,4 @@
-# State (2026-11-12, end: 0.1.0-alpha.1 released as a GitHub pre-release)
+# State (2026-11-14, end: Decomp Buddy badges; session-start GitHub check rule; issue #1 open)
 
 Read this at the start of every session. Rewrite it in place at the end of each session (never append). Stories
 behind each line: `grep` the date or topic in [docs/HISTORY.md](docs/HISTORY.md) (Riders' history:
@@ -15,7 +15,9 @@ starts on PC. **Released: 0.1.0-alpha.1 (test build, not for playing).** README 
 | 2. Windows PC | **released** (alpha.1 test build); tested (scripted routes + user play): Seaside Hill, special stage 40, Egg Fleet start, 60 fps |
 | 3. Android, 4. Linux / Steam Deck, 5. iOS | not started (backends inherited); not in the first releases |
 
-Repo public (teclilla18/sonic-heroes-recomp). Local `user.email` is the GitHub no-reply address.
+Repo public (teclilla18/sonic-heroes-recomp), Discussions on (2026-11-14, none yet). Local `user.email` is the
+GitHub no-reply address. Listed on Decomp Buddy (sonic-heroes-gamecube); README has its two badges.
+Every session starts with the GitHub issues + Discussions report (CLAUDE.md, user's rule 2026-11-14).
 
 ## Releases (user's decisions)
 
@@ -44,8 +46,11 @@ Repo public (teclilla18/sonic-heroes-recomp). Local `user.email` is the GitHub n
 
 ## Open items, in order
 
-1. **Alpha feedback**: read GitHub issues from testers. The PC release is unpacked at
-   <home>/Desktop/SonicHeroes-PC-0.1.0-alpha.1 (not yet installed or played; the user may try the launcher).
+1. **Issue #1: pulley in Grand Metropolis 1** (user, Switch OLED docked 1785/1152/2133, alpha.1, Fit): hold B on
+   the pulley and walk back, the character lets go at once. Attachments on the issue: bug-report zip
+   (bug-report-20261113-022347.zip) + shot_83945.bmp; not downloaded or read yet. Grand Metropolis never tested by
+   us. Suspects [uncertain]: held-button + stick input path, or physics/collision. PC release unpacked at
+   <home>/Desktop/SonicHeroes-PC-0.1.0-alpha.1 (not yet installed or played).
 2. **Remove the Chaos Emerald gear option** (user, 2026-11-12: a Sonic Riders feature): the launcher's checkbox
    (launcher/launcher.cpp ~1011, setting chaos_emerald_shop), g_settings.chaos_emerald (settings.c, game_mods.c,
    GAME_GEAR_* in game_addrs.h) and other Riders gear leftovers (mods_data.c gear names). Keep shared files
@@ -95,10 +100,11 @@ Local git also holds Riders' tags (v0.1.0..v0.8.0, never pushed): dev builds rep
 ## Next session
 
 ```
-Continue Sonic Heroes (STATE.md). First check GitHub issues on 0.1.0-alpha.1 (gh issue list) and triage them.
-Then take the Chaos Emerald gear option out (a Sonic Riders feature): the launcher's checkbox and the setting
-behind it (open item 2); check the launcher and the F1 menu after. Then the Fit HUD layout: team icon, Team Blast gauge and pause menu (open item 2). Start in plan mode: ask
-re-investigator for the HUD objects' position code, and get a Dolphin 4:3 reference of the pause menu (/ref-compare).
-Verify with PC shots in Fit (SR_SCREEN=3 SR_WINDOW=1280x720, fresh SR_CARD), then a console check with /hw-test.
-After that: the stage sweep with SR_DEVSTAGE. Next release: ask me for the launcher background image.
+Continue Sonic Heroes (STATE.md). Start with the GitHub issues + Discussions report (CLAUDE.md rule).
+Then issue #1 (pulley in Grand Metropolis 1 lets go): download its bug-report zip and shot into build/issue1/
+(gh issue view 1), have log-reader summarise the log, find the Grand Metropolis 1 key in notes/re/stage-select.md
+and reproduce on PC with SR_DEVSTAGE (fresh SR_CARD, SR_INPUT holding B + stick back); plan mode if the cause
+is unclear (re-investigator for the pulley object's grab/release check).
+Then the Chaos Emerald gear removal (open item 2) and the Fit HUD layout (open item 3).
+Next release: ask me for the launcher background image.
 ```

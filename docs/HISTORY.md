@@ -270,3 +270,13 @@ Dated sessions and hardware tests, oldest first. The Sonic Riders port's history
 - Road to v1.0 card 29 -> 30 %: Platforms 30 (release zips: PC installs cold in the Sandbox, Switch zip builds),
   Features 38 (Switch bug report, console-tested). User's request for the next release: replace the launcher's
   plain blue with an image the user will provide then.
+
+## 2026-11-14: Decomp Buddy badges, session-start GitHub check
+
+- README: Decomp Buddy "Listed" and "Install" badges under the banner (the game is live there as
+  sonic-heroes-gamecube, v0.1.0-alpha.1); badge images and page load [confirmed by curl].
+- CLAUDE.md rule (user's): every session starts by checking GitHub issues and Discussions and reporting them.
+  Discussions turned on by the user this session (none posted yet).
+- Issue #1 (Switch OLED docked overclock, alpha.1): in Grand Metropolis 1 the characters let go of the pulley as
+  soon as they pull back (hold B + walk back). Bug-report zip and screenshot attached; not yet looked at. Grand
+  Metropolis was never tested by us [uncertain cause: input path or physics/collision].
