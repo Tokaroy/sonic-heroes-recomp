@@ -90,10 +90,8 @@ Local git also holds Riders' tags (v0.1.0..v0.8.0, never pushed): dev builds rep
 
 ```
 Continue Sonic Heroes (STATE.md). Start with the GitHub issues + Discussions report (CLAUDE.md rule).
-Then issue #1 (pulley in Grand Metropolis 1 lets go): download its bug-report zip and shot into build/issue1/
-(gh issue view 1), have log-reader summarise the log, find the Grand Metropolis 1 key in notes/re/stage-select.md
-and reproduce on PC with SR_DEVSTAGE (fresh SR_CARD, SR_INPUT holding B + stick back); plan mode if the cause
-is unclear (re-investigator for the pulley object's grab/release check).
-Then the Chaos Emerald gear removal (open item 2) and the Fit HUD layout (open item 3).
+Then open item 1: check the Rt2d HUD fix (dc10ef4) on the Switch (subtitles in one piece, team icons at the
+right edge, pause menu, 16:9 "HUD 4:3"); revert to alpha.1 if subtitles still split. Then open item 2: re-measure
+the Grand Metropolis 1 start in handheld with the new sys-clk profile.
 Next release: ask me for the launcher background image.
 ```
